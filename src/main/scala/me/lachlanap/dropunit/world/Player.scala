@@ -6,7 +6,7 @@ case class Area(orientation: Orientation, columns: Array[Column], orders: Set[Bu
 
 
 case class BuildingOrder(column: Column)
-case class Column(stack: List[Unit])
+case class Column(stack: List[Block])
 
 sealed trait Orientation
 
