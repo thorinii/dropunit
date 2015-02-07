@@ -35,12 +35,12 @@ object Launcher {
       var y = 0
       for(block <- column.stack) {
         val state = block.blueprint.specs match {
-          case UnitSpecs(_, UnitPowerGeneration(p), _) if p >= 1 => '!'
-          case UnitSpecs(_, _, UnitStrength(s)) if s >= 4 => area.orientation match {
+          case Specs(_, PowerGeneration(p), _) if p >= 1 => '!'
+          case Specs(_, _, Strength(s)) if s >= 4 => area.orientation match {
             case FacingLeft => '('
             case FacingRight => ')'
           }
-          case UnitSpecs(UnitStrength(s), _, _) if s >= 2 => '#'
+          case Specs(Strength(s), _, _) if s >= 2 => '#'
           case _ => 'O'
         }
 
