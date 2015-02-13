@@ -4,12 +4,11 @@ package me.lachlanap.dropunit.world
  * The workhorse of the game.
  */
 class Block(val blueprint: Blueprint) {
-
 }
 
 
 
-case class Blueprint(name: String, specs: Specs)
+case class Blueprint(id: String, name: String, specs: Specs)
 
 case class Specs(strength: Strength = Strength(1),
                  power: Power = PowerNone,
