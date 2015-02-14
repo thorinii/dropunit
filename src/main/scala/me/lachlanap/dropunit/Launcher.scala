@@ -1,55 +1,35 @@
 package me.lachlanap.dropunit
 
+import me.lachlanap.dropunit.resources.DiskBlueprintLoader
+import me.lachlanap.dropunit.ui.DropUnitCore
 import me.lachlanap.dropunit.world._
 import scala.reflect.ClassTag
 
 object Launcher {
   def main(args: Array[String]): Unit = {
+    import com.badlogic.gdx.backends.lwjgl._
+
+    val appcfg = new LwjglApplicationConfiguration
+    appcfg.title = "Drop Unit"
+    appcfg.height = 480
+    appcfg.width = 800
+    appcfg.forceExit = false
+    appcfg.backgroundFPS = -1
+    appcfg.resizable = false
+    appcfg.vSyncEnabled = true
+    val app = new LwjglApplication(new DropUnitCore, appcfg)
+
     val config = WorldConfiguration(
       columns = 5,
       separation = 10,
       maxHeight = 10
     )
 
-    val world = World.build(config, new BlueprintLoader {
-      import java.nio.file.{Files, Paths}
-      import scala.collection.JavaConversions._
-      import com.typesafe.config.ConfigFactory
-
-      val gamedata = Paths.get(".", "gamedata")
-      val blueprintsDir = gamedata.resolve("blueprints")
-
-      override def loadAll(): BlueprintSet = {
-        val blueprintIds = Files.newDirectoryStream(blueprintsDir)
-                                .map(blueprintsDir.relativize(_).toString)
-                                .filter(_.endsWith(".blpt"))
-                                .map(file => file.substring(0, file.length - 5))
-                                .toList
-
-        val blueprints = blueprintIds.map(load _)
-        new BlueprintSet(blueprints.toSet)
-      }
-
-      override def load(name: String): Blueprint = {
-        val file = blueprintsDir.resolve(name + ".blpt").toFile
-
-        val config = ConfigFactory.parseFile(file)
-
-        val strength = Strength(config.getInt("strength"))
-        val power = config.getInt("power") match {
-          case p if p > 0 => PowerGeneration(p)
-          case p if p < 0 => PowerConsumption(p)
-          case _ => PowerNone
-        }
-        val attackStrength = Strength(config.getInt("attack-strength"))
-
-        val specs = Specs(strength, power, attackStrength)
-        Blueprint(id = name, name = config.getString("name"), specs)
-      }
-    })
-
+    val world = World.build(config, new DiskBlueprintLoader)
 
     render(world)
+
+    app.exit()
   }
 
   def render(world: World) = {
@@ -121,7 +101,7 @@ object Launcher {
         "-)"
     }
     case Specs(Strength(s), _, _) if s >= 2 =>
-      "^^" +
+      "##" +
       "##"
     case _ =>
       """/\""" +
