@@ -9,27 +9,24 @@ object Launcher {
   def main(args: Array[String]): Unit = {
     import com.badlogic.gdx.backends.lwjgl._
 
-    val appcfg = new LwjglApplicationConfiguration
-    appcfg.title = "Drop Unit"
-    appcfg.height = 480
-    appcfg.width = 800
-    appcfg.forceExit = false
-    appcfg.backgroundFPS = -1
-    appcfg.resizable = false
-    appcfg.vSyncEnabled = true
-    val app = new LwjglApplication(new DropUnitCore, appcfg)
-
     val config = WorldConfiguration(
       columns = 5,
       separation = 10,
       maxHeight = 10
     )
 
+    val appcfg = new LwjglApplicationConfiguration
+    appcfg.title = "Drop Unit"
+    appcfg.width = 800
+    appcfg.height = 480
+    appcfg.forceExit = false
+    appcfg.backgroundFPS = -1
+    appcfg.resizable = false
+    appcfg.vSyncEnabled = true
+    val app = new LwjglApplication(new DropUnitCore(config, new DiskBlueprintLoader), appcfg)
+
     val world = World.build(config, new DiskBlueprintLoader)
-
     render(world)
-
-    app.exit()
   }
 
   def render(world: World) = {
