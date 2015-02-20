@@ -8,7 +8,7 @@ import me.lachlanap.dropunit.world._
 /**
  * Renders the world with OpenGL.
  */
-class Renderer(worldConfig: WorldConfig, config: UIConfig) {
+class Renderer(worldConfig: WorldConfig, config: UIConfig, inputHandler: InputHandler) {
   val camera = new OrthographicCamera()
   val batch = new SpriteBatch()
 
