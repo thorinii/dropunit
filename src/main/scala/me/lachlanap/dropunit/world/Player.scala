@@ -6,9 +6,11 @@ case class Area(orientation: Orientation, columns: Array[Column], orders: Set[Bu
 
 
 case class BuildingOrder(column: Column, blueprint: Blueprint)
+
 case class Column(stack: List[Block])
 
 sealed trait Orientation
 
 case object FacingLeft extends Orientation
+
 case object FacingRight extends Orientation

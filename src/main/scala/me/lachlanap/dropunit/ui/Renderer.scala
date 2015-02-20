@@ -2,24 +2,23 @@ package me.lachlanap.dropunit.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.{Texture, OrthographicCamera, GL20}
+import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
 import me.lachlanap.dropunit.world._
 
 /**
  * Renders the world with OpenGL.
  */
-class Renderer {
+class Renderer(worldConfig: WorldConfig, config: UIConfig) {
   val camera = new OrthographicCamera()
   val batch = new SpriteBatch()
 
-  val blockTexture = new Texture("gamedata/textures/block-wooden-frame.png")
+  val columnWidth = config.toPixels(worldConfig.columnWidth)
+  val blockHeight = config.toPixels(worldConfig.columnWidth)
+  val centreX = config.width / 2.0
 
-  val columnWidth = blockTexture.getWidth.toFloat
-  val blockHeight = blockTexture.getHeight.toFloat
+  camera.setToOrtho(false, config.width, config.height)
 
-  camera.setToOrtho(false, 800, 480)
-
-  def render(world: World) = {
+  def render(world: World, textures: Textures) = {
     Gdx.gl.glClearColor(.4f, .7f, 1f, 1)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -27,22 +26,26 @@ class Renderer {
 
     batch.setProjectionMatrix(camera.combined)
     batch.begin()
-    renderPlayer(world, world.leftPlayer, batch)
-    renderPlayer(world, world.rightPlayer, batch)
+    renderPlayer(world, textures, world.leftPlayer, batch)
+    renderPlayer(world, textures, world.rightPlayer, batch)
     batch.end()
   }
 
-  def renderPlayer(world: World, area: Area, batch: SpriteBatch) = {
+  def renderPlayer(world: World, textures: Textures, area: Area, batch: SpriteBatch) = {
     val isLeft = area.orientation == FacingRight
     var x = 0
 
-    for (column: Column <- area.columns) {
+    val halfSeparation = config.toPixels(worldConfig.separation / 2)
+
+    for (column <- area.columns) {
       var y = 0
 
-      for(block: Block <- column.stack) {
-        val px = if(isLeft) x * columnWidth else 800 - x * columnWidth - columnWidth
+      for (block <- column.stack) {
+        val px = if (isLeft) centreX - halfSeparation - x * columnWidth - columnWidth
+                 else centreX + halfSeparation + x * columnWidth
 
-        batch.draw(blockTexture, px, y * blockHeight)
+        batch.draw(textures.block(block, area.orientation),
+                   px.toFloat, (y * blockHeight).toFloat)
 
         y += 1
       }

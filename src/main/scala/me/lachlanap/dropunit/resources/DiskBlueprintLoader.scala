@@ -1,10 +1,11 @@
 package me.lachlanap.dropunit.resources
 
 import java.nio.file.{Files, Paths}
-import scala.collection.JavaConversions._
 
 import com.typesafe.config.ConfigFactory
 import me.lachlanap.dropunit.world._
+
+import scala.collection.JavaConversions._
 
 /**
  * Loads Blueprints from disk
@@ -15,10 +16,10 @@ class DiskBlueprintLoader extends BlueprintLoader {
 
   override def loadAll(): BlueprintSet = {
     val blueprintIds = Files.newDirectoryStream(blueprintsDir)
-      .map(blueprintsDir.relativize(_).toString)
-      .filter(_.endsWith(".blpt"))
-      .map(file => file.substring(0, file.length - 5))
-      .toList
+                       .map(blueprintsDir.relativize(_).toString)
+                       .filter(_.endsWith(".blpt"))
+                       .map(file => file.substring(0, file.length - 5))
+                       .toList
 
     val blueprints = blueprintIds.map(load _)
     new BlueprintSet(blueprints.toSet)

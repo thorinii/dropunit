@@ -10,5 +10,6 @@ class BlueprintSet(_blueprints: Set[Blueprint]) {
 
 trait BlueprintLoader {
   def load(name: String): Blueprint
+
   def loadAll(): BlueprintSet
 }

@@ -7,7 +7,6 @@ class Block(val blueprint: Blueprint) {
 }
 
 
-
 case class Blueprint(id: String, name: String, specs: Specs)
 
 case class Specs(strength: Strength = Strength(1),
@@ -17,6 +16,9 @@ case class Specs(strength: Strength = Strength(1),
 case class Strength(strength: Int)
 
 sealed trait Power
+
 case class PowerGeneration(amount: Int) extends Power
+
 case class PowerConsumption(amount: Int) extends Power
+
 case object PowerNone extends Power
