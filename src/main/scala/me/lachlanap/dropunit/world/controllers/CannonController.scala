@@ -1,6 +1,6 @@
 package me.lachlanap.dropunit.world.controllers
 
-import me.lachlanap.dropunit.world.{Vector2, BlockController, Transform}
+import me.lachlanap.dropunit.world._
 
 object CannonController {
   val Cooldown = 2
@@ -10,12 +10,14 @@ object CannonController {
 
 case class CannonController(timeTillNextFire: Double, angle: Double) extends BlockController {
 
-  override def step(dt: Double, centre: Vector2): (BlockController, List[Transform]) = {
+  override def step(dt: Double, centre: Vector2, orientation: Orientation): (BlockController, List[Transform]) = {
     val nextFire = timeTillNextFire - dt
 
     if (nextFire <= 0) {
       println("FIRING")
-      (CannonController(CannonController.Cooldown, angle), Nil)
+      (CannonController(CannonController.Cooldown, angle), List(
+        SpawnEntity(Entities.cannonBall(centre, orientation))
+      ))
     } else {
       (CannonController(nextFire, angle), Nil)
     }

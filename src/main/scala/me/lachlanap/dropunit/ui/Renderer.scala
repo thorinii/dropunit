@@ -28,6 +28,7 @@ class Renderer(worldConfig: WorldConfig, config: UIConfig, inputHandler: InputHa
     batch.begin()
     renderPlayer(world, textures, world.leftPlayer, batch)
     renderPlayer(world, textures, world.rightPlayer, batch)
+    renderEntities(world, textures, batch)
     batch.end()
   }
 
@@ -51,6 +52,15 @@ class Renderer(worldConfig: WorldConfig, config: UIConfig, inputHandler: InputHa
       }
 
       x += 1
+    }
+  }
+
+  def renderEntities(world: World, textures: Textures, batch: SpriteBatch) = {
+    for (entity <- world.entities) {
+      val texture = textures.entity(entity)
+      batch.draw(texture,
+                 config.toPixels(entity.pos.x).toFloat - texture.getWidth / 2 + centreX.toFloat,
+                 config.toPixels(entity.pos.y).toFloat - texture.getHeight / 2)
     }
   }
 }

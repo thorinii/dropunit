@@ -12,7 +12,8 @@ object World {
       config,
       blueprints,
       buildPlayer(config, blueprints, FacingRight),
-      buildPlayer(config, blueprints, FacingLeft))
+      buildPlayer(config, blueprints, FacingLeft),
+      Nil)
   }
 
   private def buildPlayer(config: WorldConfig, set: BlueprintSet, orientation: Orientation) = {
@@ -33,10 +34,11 @@ object World {
  */
 class World(val config: WorldConfig,
             val blueprints: BlueprintSet,
-            val leftPlayer: Area, val rightPlayer: Area) {
+            val leftPlayer: Area, val rightPlayer: Area,
+            val entities: List[Entity]) {
 
   def reloadBlueprints(loader: BlueprintLoader) = {
-    new World(config, loader.loadAll(), leftPlayer, rightPlayer)
+    new World(config, loader.loadAll(), leftPlayer, rightPlayer, entities)
   }
 
   def step(dt: Double) = {
@@ -44,13 +46,15 @@ class World(val config: WorldConfig,
     val (right, rightActions) = rightPlayer.step(dt, config.columnWidth, config.separation / 2)
 
     val actions = leftActions ++ rightActions
-    if (!actions.isEmpty)
+    if (actions.nonEmpty)
       println(s"$actions to execute")
 
-    new World(config, blueprints, left, right)
-  }
+    // TODO: entity processing
 
-  // TODO: entity spawning; entity processing
+    val stepped = new World(config, blueprints, left, right, entities)
+
+    actions.foldLeft(stepped) { (w, a) => a.applyTo(w) }
+  }
 }
 
 

@@ -1,7 +1,7 @@
 package me.lachlanap.dropunit.ui
 
 import com.badlogic.gdx.graphics.Texture
-import me.lachlanap.dropunit.world.{Block, Orientation}
+import me.lachlanap.dropunit.world.{Entity, Block, Orientation}
 
 object Textures {
   def load(): Textures = {
@@ -21,5 +21,9 @@ class Textures(loadTexture: String => Texture) {
   def block(block: Block, direction: Orientation) = block.blueprint.id match {
     case "wooden-cannon" => woodenCannon
     case _ => woodenFrame
+  }
+
+  def entity(entity: Entity) = entity.kind match {
+    case _ => cannonBall
   }
 }
