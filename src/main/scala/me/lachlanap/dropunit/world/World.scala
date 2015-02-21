@@ -1,7 +1,5 @@
 package me.lachlanap.dropunit.world
 
-import scala.collection.Set
-
 case class WorldConfig(columns: Int, columnWidth: Int,
                        separation: Int,
                        maxHeight: Int)
@@ -23,11 +21,11 @@ object World {
                Column(List(block(set, "wooden-miner"), block(set, "wooden-generator"))),
                Column(List(block(set, "wooden-frame"), block(set, "wooden-generator"), block(set, "wooden-generator"), block(set, "wooden-generator"))),
                Column(List(block(set, "wooden-frame"), block(set, "wooden-frame"), block(set, "wooden-frame"), block(set, "wooden-frame"))),
-               Column(List(block(set, "wooden-frame"), block(set, "wooden-shield-em"), block(set, "wooden-shield-em"), block(set, "wooden-shield-em")))).reverse,
-         Set.empty)
+               Column(List(block(set, "wooden-frame"), block(set, "wooden-shield-em"), block(set, "wooden-shield-em"), block(set, "wooden-cannon")))).reverse,
+         Nil)
   }
 
-  private def block(set: BlueprintSet, id: String) = new Block(set.byName(id))
+  private def block(set: BlueprintSet, id: String) = set.byName(id).build()
 }
 
 /**
@@ -41,7 +39,18 @@ class World(val config: WorldConfig,
     new World(config, loader.loadAll(), leftPlayer, rightPlayer)
   }
 
-  def step(dt: Double) = new World(config, blueprints, leftPlayer, rightPlayer)
+  def step(dt: Double) = {
+    val (left, leftActions) = leftPlayer.step(dt, config.columnWidth, config.separation / 2)
+    val (right, rightActions) = rightPlayer.step(dt, config.columnWidth, config.separation / 2)
+
+    val actions = leftActions ++ rightActions
+    if (!actions.isEmpty)
+      println(s"$actions to execute")
+
+    new World(config, blueprints, left, right)
+  }
+
+  // TODO: entity spawning; entity processing
 }
 
 

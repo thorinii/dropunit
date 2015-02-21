@@ -3,22 +3,18 @@ package me.lachlanap.dropunit.world
 /**
  * The workhorse of the game.
  */
-class Block(val blueprint: Blueprint) {
+class Block(val blueprint: Blueprint, controller: BlockController) {
+  def step(dt: Double, centre: Vector2): (Block, List[Transform]) = {
+    val (nextController, actions) = controller.step(dt, centre)
+    (new Block(blueprint, nextController), actions)
+  }
 }
 
 
-case class Blueprint(id: String, name: String, specs: Specs)
+trait BlockController {
+  def step(dt: Double, centre: Vector2): (BlockController, List[Transform])
+}
 
-case class Specs(strength: Strength = Strength(1),
-                 power: Power = PowerNone,
-                 attackStrength: Strength = Strength(1))
-
-case class Strength(strength: Int)
-
-sealed trait Power
-
-case class PowerGeneration(amount: Int) extends Power
-
-case class PowerConsumption(amount: Int) extends Power
-
-case object PowerNone extends Power
+case object NilController extends BlockController {
+  override def step(dt: Double, centre: Vector2) = (this, Nil)
+}

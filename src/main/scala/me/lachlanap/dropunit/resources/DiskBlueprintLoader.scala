@@ -2,8 +2,9 @@ package me.lachlanap.dropunit.resources
 
 import java.nio.file.{Files, Paths}
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import me.lachlanap.dropunit.world._
+import me.lachlanap.dropunit.world.controllers.CannonController
 
 import scala.collection.JavaConversions._
 
@@ -21,7 +22,7 @@ class DiskBlueprintLoader extends BlueprintLoader {
                        .map(file => file.substring(0, file.length - 5))
                        .toList
 
-    val blueprints = blueprintIds.map(load _)
+    val blueprints = blueprintIds.map(load)
     new BlueprintSet(blueprints.toSet)
   }
 
@@ -38,7 +39,24 @@ class DiskBlueprintLoader extends BlueprintLoader {
     }
     val attackStrength = Strength(config.getInt("attack-strength"))
 
+    val controllerFactory = controllerFactoryFor(config.getOptionalString("controller"))
+
     val specs = Specs(strength, power, attackStrength)
-    Blueprint(id = name, name = config.getString("name"), specs)
+    Blueprint(id = name, name = config.getString("name"), specs, controllerFactory)
+  }
+
+  private def controllerFactoryFor(id: Option[String]): () => BlockController = {
+    id.map {
+             case "cannon" => () => CannonController()
+             case _ => () => NilController
+           }.getOrElse(() => NilController)
+  }
+
+  implicit class RichConfig(val underlying: Config) {
+    def getOptionalString(path: String): Option[String] = if (underlying.hasPath(path)) {
+      Some(underlying.getString(path))
+    } else {
+      None
+    }
   }
 }

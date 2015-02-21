@@ -11,7 +11,7 @@ object Launcher {
     val worldConfig = WorldConfig(
       columns = 5,
       columnWidth = 2,
-      separation = 8,
+      separation = 10,
       maxHeight = 10
     )
 

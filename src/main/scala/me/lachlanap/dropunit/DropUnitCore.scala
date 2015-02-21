@@ -44,5 +44,8 @@ class DropUnitCore(worldConfig: WorldConfig, uiConfig: UIConfig, blueprintLoader
 
       inputHandler.setWorld(world)
     }
+
+    if(Gdx.graphics.getFrameId % 30 == 0)
+      println(Gdx.graphics.getFramesPerSecond)
   }
 }

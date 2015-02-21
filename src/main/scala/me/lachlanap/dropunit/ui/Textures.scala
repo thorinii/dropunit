@@ -14,6 +14,12 @@ object Textures {
  */
 class Textures(loadTexture: String => Texture) {
   val woodenFrame = loadTexture("block-wooden-frame")
+  val woodenCannon = loadTexture("block-wooden-cannon")
 
-  def block(block: Block, direction: Orientation) = woodenFrame
+  val cannonBall = loadTexture("entity-cannonball")
+
+  def block(block: Block, direction: Orientation) = block.blueprint.id match {
+    case "wooden-cannon" => woodenCannon
+    case _ => woodenFrame
+  }
 }
