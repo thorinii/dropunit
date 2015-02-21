@@ -8,11 +8,26 @@ trait Transform {
 }
 
 
-case class SpawnEntity(entity: Entity) extends Transform {
+case class SpawnEntity(entity: (Id) => Entity) extends Transform {
   override def applyTo(world: World): World = {
-    // TODO: entity spawning
     new World(world.config, world.blueprints,
               world.leftPlayer, world.rightPlayer,
-              entity :: world.entities)
+              entity(world.entityIdGenerator.next()) :: world.entities)
+  }
+}
+
+case class DestroyEntity(entity: Entity) extends Transform {
+  override def applyTo(world: World): World = {
+    new World(world.config, world.blueprints,
+              world.leftPlayer, world.rightPlayer,
+              world.entities.filterNot(_.id == entity.id))
+  }
+}
+
+case class DamageBlock(block: Block, amount: Double) extends Transform {
+  override def applyTo(world: World): World = {
+    new World(world.config, world.blueprints,
+              world.leftPlayer.damage(block, amount), world.rightPlayer.damage(block, amount),
+              world.entities)
   }
 }

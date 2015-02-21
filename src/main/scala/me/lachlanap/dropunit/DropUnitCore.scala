@@ -35,15 +35,15 @@ class DropUnitCore(worldConfig: WorldConfig, uiConfig: UIConfig, blueprintLoader
   var timeToTick = 0.0
 
   override def render(): Unit = {
-    renderer.render(world, textures)
-
     timeToTick -= Gdx.graphics.getDeltaTime
     if (timeToTick <= 0) {
       timeToTick = TickFrequency
-      world = world.step(TickFrequency)
+      world = world.step(TickFrequency)._1
 
       inputHandler.setWorld(world)
     }
+
+    renderer.render(world, textures)
 
     if(Gdx.graphics.getFrameId % 30 == 0)
       println(Gdx.graphics.getFramesPerSecond)

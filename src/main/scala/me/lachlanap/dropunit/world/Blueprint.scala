@@ -2,7 +2,7 @@ package me.lachlanap.dropunit.world
 
 
 case class Blueprint(id: String, name: String, specs: Specs, controllerFactory: () => BlockController) {
-  def build() = new Block(this, controllerFactory())
+  def build(id: Id) = new Block(this, id, specs.attackStrength.strength, controllerFactory())
 }
 
 case class Specs(strength: Strength = Strength(1),

@@ -26,7 +26,12 @@ object World {
          Nil)
   }
 
-  private def block(set: BlueprintSet, id: String) = set.byName(id).build()
+  var counter: Long = 0
+
+  private def block(set: BlueprintSet, id: String) = {
+    counter += 1
+    set.byName(id).build(Id(counter))
+  }
 }
 
 /**
@@ -37,15 +42,18 @@ class World(val config: WorldConfig,
             val leftPlayer: Area, val rightPlayer: Area,
             val entities: List[Entity]) {
   val Gravity = 9.81
+  val entityIdGenerator = new IdGenerator
 
   def reloadBlueprints(loader: BlueprintLoader) = {
     new World(config, loader.loadAll(), leftPlayer, rightPlayer, entities)
   }
 
-  def step(dt: Double) = {
+  def step(dt: Double): (World, List[Transform]) = {
+    val collisionView = new CollisionView(this)
+
     val (left, leftActions) = leftPlayer.step(dt, config.columnWidth, config.separation / 2)
     val (right, rightActions) = rightPlayer.step(dt, config.columnWidth, config.separation / 2)
-    val entityUpdate = entities.map(_.step(dt, Gravity))
+    val entityUpdate = entities.map(_.step(dt, Gravity, collisionView))
 
     val steppedEntities = entityUpdate.map(_._1)
     val entityActions = entityUpdate.flatMap(_._2)
@@ -56,7 +64,9 @@ class World(val config: WorldConfig,
 
     val stepped = new World(config, blueprints, left, right, steppedEntities)
 
-    actions.foldLeft(stepped) { (w, a) => a.applyTo(w) }
+    val nextWorld = actions.foldLeft(stepped) { (w, a) => a.applyTo(w) }
+
+    (nextWorld, actions)
   }
 }
 

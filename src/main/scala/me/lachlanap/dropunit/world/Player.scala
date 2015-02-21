@@ -10,6 +10,10 @@ case class Area(orientation: Orientation, columns: Array[Column], orders: List[B
     val actions = update.flatMap(_._2).toList
     (new Area(orientation, update.map(_._1), orders), actions)
   }
+
+  def damage(block: Block, amount: Double): Area = {
+    copy(columns = columns.map(_.damage(block, amount)))
+  }
 }
 
 
@@ -20,6 +24,11 @@ case class Column(stack: List[Block]) {
     val update = stack.map(doIndexed((i, b) => b.step(dt, Vector2(x, blockHeight * i + blockHeight / 2), orientation)))
     val actions = update.flatMap(_._2)
     (new Column(update.map(_._1)), actions)
+  }
+
+  def damage(block: Block, amount: Double): Column = {
+    // TODO: Remove the filter() instead calling a DestroyBlock transform
+    Column(stack.map { b => if (b.id == block.id) b.damage(amount) else b } filter (_.health > 0))
   }
 }
 
