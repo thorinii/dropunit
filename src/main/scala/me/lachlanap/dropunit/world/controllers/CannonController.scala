@@ -12,11 +12,12 @@ case class CannonController(timeTillNextFire: Double, angle: Double) extends Blo
 
   override def step(dt: Double, centre: Vector2, orientation: Orientation): (BlockController, List[Transform]) = {
     val nextFire = timeTillNextFire - dt
+    val absAngle = if(orientation == FacingRight) angle else 180 - angle
 
     if (nextFire <= 0) {
       println("FIRING")
       (CannonController(CannonController.Cooldown, angle), List(
-        SpawnEntity(Entities.cannonBall(centre, orientation))
+        SpawnEntity(Entities.cannonBall(centre, absAngle, orientation))
       ))
     } else {
       (CannonController(nextFire, angle), Nil)

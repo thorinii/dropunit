@@ -36,6 +36,7 @@ class World(val config: WorldConfig,
             val blueprints: BlueprintSet,
             val leftPlayer: Area, val rightPlayer: Area,
             val entities: List[Entity]) {
+  val Gravity = 9.81
 
   def reloadBlueprints(loader: BlueprintLoader) = {
     new World(config, loader.loadAll(), leftPlayer, rightPlayer, entities)
@@ -44,14 +45,16 @@ class World(val config: WorldConfig,
   def step(dt: Double) = {
     val (left, leftActions) = leftPlayer.step(dt, config.columnWidth, config.separation / 2)
     val (right, rightActions) = rightPlayer.step(dt, config.columnWidth, config.separation / 2)
+    val entityUpdate = entities.map(_.step(dt, Gravity))
 
-    val actions = leftActions ++ rightActions
+    val steppedEntities = entityUpdate.map(_._1)
+    val entityActions = entityUpdate.flatMap(_._2)
+
+    val actions = leftActions ++ rightActions ++ entityActions
     if (actions.nonEmpty)
       println(s"$actions to execute")
 
-    // TODO: entity processing
-
-    val stepped = new World(config, blueprints, left, right, entities)
+    val stepped = new World(config, blueprints, left, right, steppedEntities)
 
     actions.foldLeft(stepped) { (w, a) => a.applyTo(w) }
   }
